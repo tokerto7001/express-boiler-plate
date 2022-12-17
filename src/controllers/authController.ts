@@ -2,11 +2,11 @@ import { RequestHandler } from "express";
 import { AuthService } from "../services/authService";
 const authService = new AuthService();
 
-export const registerUser: RequestHandler = (req, res, next) => {
+export const registerUser: RequestHandler = async (req, res, next) => {
     try {
-        const result = authService.registerUser(req.body)
+        const result = await authService.registerUser(req.body)
         res.send({ status: 'success', message: 'User register is successsful', result })
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        res.send({ status: 'fail', message: error.message, result: null })
     }
 }

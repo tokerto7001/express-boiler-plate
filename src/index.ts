@@ -9,6 +9,10 @@ import app from './app';
 import dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 
+// connect to mongodb
+import { connectToMongoDb } from './clients/mongo';
+connectToMongoDb();
+
 // initiate the server
 const server = app.listen(process.env.PORT, () => console.log(`Serves is awake on port ${process.env.PORT}`));
 
