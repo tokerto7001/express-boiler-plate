@@ -1,11 +1,20 @@
 import { Schema, model } from "mongoose";
 
-interface UserDoc {
+export type Role = 'admin' | 'user'
+export interface UserDoc {
+    id: string
     firstName: string
     lastName: string
     email: string
     password: string
     isActive: boolean
+    role: Role
+}
+export interface UserAttributes {
+    firstName?: string
+    lastName?: string
+    email: string
+    password: string
 }
 
 const userSchema = new Schema<UserDoc>(
@@ -47,6 +56,11 @@ const userSchema = new Schema<UserDoc>(
             type: Boolean,
             required: [true, 'firstName is a must!'],
             default: true //TODO: After the email service is constructed, change it to false
+        },
+        role: {
+            type: String,
+            required: true,
+            default: 'user'
         }
     },
     {
@@ -74,4 +88,4 @@ const userSchema = new Schema<UserDoc>(
 
 const User = model<UserDoc>('User', userSchema);
 
-export { User, UserDoc }
+export { User }
