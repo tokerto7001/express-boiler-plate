@@ -1,5 +1,6 @@
 import sendgrid from '@sendgrid/mail'
 import { welcomeMail } from '../mail/welcomeMail'
+import nodemailer from 'nodemailer'
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY) // setting the API key
 
 interface sendingData { // can be extended later
@@ -12,14 +13,32 @@ export class MailService {
 
     public sendMail = async (mailTemplate: string, data: sendingData) => {
         try {
-            await sendgrid.send(
+            const transporter = nodemailer.createTransport(
                 {
-                    to: data.to,
+                    host: 'smtp.sendgrid.net', // server host for SMTP relay of SendGrid
+                    port: 587, // recommended port
+                    auth: {
+                        user: 'apikey',
+                        pass: process.env.SENDGRID_API_KEY
+                    }
+                }
+            )
+            const info = await transporter.sendMail(
+                {
                     from: process.env.SENDGRID_TO,
+                    to: data.to,
                     subject: data.subject,
                     html: mailTemplate
                 }
             )
+            // await sendgrid.send(
+            //     {
+            //         to: data.to,
+            //         from: process.env.SENDGRID_TO,
+            //         subject: data.subject,
+            //         html: mailTemplate
+            //     }
+            // )
         } catch (err) {
             throw err
         }
