@@ -1,8 +1,8 @@
 import { User, UserDoc } from "../models/user";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { UserAttributes } from '../models/user';
 import { CookieConfigOptions } from "../types/cookieConfigOptions";
+import { AuthHelpers } from "../utils/authHelpers";
+const authHelpers = new AuthHelpers()
 
 export class AuthService {
     constructor() { }
@@ -11,7 +11,7 @@ export class AuthService {
         const { firstName, lastName, email, password } = body;
         const alreadyExist = await User.findOne({ email });
         if (alreadyExist) throw Error('User already registered')
-        const hashedPassword = await this.hashPassword(password);
+        const hashedPassword = await authHelpers.hashPassword(password.toString());
         const user = await User.create({ firstName, lastName, email, password: hashedPassword });
         return user;
     };
@@ -20,27 +20,15 @@ export class AuthService {
         const { email, password } = body;
         const user = await User.findOne({ email });
         if (!user) throw Error('User not found!');
-        const doesMatch = await bcrypt.compare(password, user.password);
+        const doesMatch = await authHelpers.comparePassword(password, user.password);
         if (!doesMatch) throw Error('Wrong password!');
-        const { token, cookieConfig } = this.createCookie(user);
+        const { token, cookieConfig } = await authHelpers.createCookie(user);
         return { token, cookieConfig };
     };
 
-    private hashPassword = async (password: string): Promise<string> => {
-        const hashedPassword = await bcrypt.hash(password, +process.env.HASH_CYCLE!);
-        return hashedPassword;
-    };
+    public passwordChange = async (oldPassword: string, newPassword: string, newPasswordConfirm: string): Promise<{}> => {
 
-    private createCookie = (user: UserDoc): { token: string, cookieConfig: CookieConfigOptions } => {
-        const { id, role, email } = user;
-        const token = jwt.sign({
-            id, role, email
-        }, process.env.JWT_SECRET_KEY!);
-        const cookieConfig: CookieConfigOptions = {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax'
-        }
-        return { token, cookieConfig };
+        return {}
     }
+
 }
