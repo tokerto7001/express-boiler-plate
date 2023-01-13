@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { AuthHelpers } from "../utils/authHelpers";
+import { AuthHelpers } from "../helpers/authHelpers";
 const authHelpers = new AuthHelpers();
 
 export const isLoggedIn: RequestHandler = async (req, res, next) => {

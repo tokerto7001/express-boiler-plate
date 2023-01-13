@@ -6,7 +6,7 @@ export interface UserDoc {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string
     isVerified: boolean
     role: Role
 }
@@ -54,7 +54,7 @@ const userSchema = new Schema<UserDoc>(
         },
         isVerified: {
             type: Boolean,
-            default: false //TODO: After the email service is constructed, change it to false
+            default: false
         },
         role: {
             type: String,

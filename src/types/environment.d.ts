@@ -6,6 +6,9 @@ declare global {
             HASH_CYCLE: number
             MONGODB_CONNECTION_URL: string
             PORT: 8080
+            SENDGRID_TO: string
+            NODE_ENV: 'production' | 'development'
+            API_URL: string
         }
     }
 }

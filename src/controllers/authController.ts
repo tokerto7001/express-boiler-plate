@@ -11,6 +11,17 @@ export const registerUser: RequestHandler = async (req, res, next) => {
     }
 };
 
+export const verifyUser: RequestHandler = async (req, res, next) => {
+    try {
+        const result = await authService.verifyUser(req.params.token)
+        res
+            .cookie('token', result.token, result.cookieConfig)
+            .redirect('/client-url')
+    } catch (error: any) {
+        res.status(400).send({ status: 'fail', message: error.message, result: null })
+    }
+};
+
 export const loginUser: RequestHandler = async (req, res, next) => {
     try {
         const result = await authService.loginUser(req.body);
