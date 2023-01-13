@@ -4,10 +4,11 @@ process.on("uncaughtException", err => {
     console.log(err.stack);
     process.exit(1);
 });
-
-import app from './app';
 import dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
+import app from './app';
+
+
 
 // connect to mongodb
 import { connectToMongoDb } from './clients/mongo';

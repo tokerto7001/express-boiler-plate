@@ -2,6 +2,7 @@ import { User, UserDoc } from "../models/user";
 import { UserAttributes } from '../models/user';
 import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import { AuthHelpers } from "../utils/authHelpers";
+
 const authHelpers = new AuthHelpers()
 
 export class AuthService {

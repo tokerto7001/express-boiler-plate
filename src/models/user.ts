@@ -7,7 +7,7 @@ export interface UserDoc {
     lastName: string
     email: string
     password: string
-    isActive: boolean
+    isVerified: boolean
     role: Role
 }
 export interface UserAttributes {
@@ -52,10 +52,9 @@ const userSchema = new Schema<UserDoc>(
             trim: true,
             minlength: [8, 'password must be longer than 8 characters']
         },
-        isActive: {
+        isVerified: {
             type: Boolean,
-            required: [true, 'firstName is a must!'],
-            default: true //TODO: After the email service is constructed, change it to false
+            default: false //TODO: After the email service is constructed, change it to false
         },
         role: {
             type: String,
