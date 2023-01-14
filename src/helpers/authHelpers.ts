@@ -1,7 +1,6 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import bcrypt from 'bcrypt';
-import { UserDoc } from "../models/user";
 import { HASH_CYCLE, JWT_SECRET_KEY } from '../config';
 import { CookieData } from '../types/cookieData';
 

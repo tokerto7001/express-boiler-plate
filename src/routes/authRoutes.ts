@@ -1,7 +1,7 @@
 import express from 'express';
 import { loginUser, registerUser, verifyUser } from '../controllers/authController';
 import { checkBodyProperties } from '../middlewares/checkBodyProperties';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
+
 const router = express.Router();
 
 router
@@ -11,7 +11,6 @@ router
     .get('/verify/:token',
         verifyUser)
     .post('/login',
-        isLoggedIn,
         checkBodyProperties(['email', 'password']),
         loginUser)
 
