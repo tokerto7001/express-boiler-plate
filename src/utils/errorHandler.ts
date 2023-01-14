@@ -9,8 +9,12 @@ export const errorHandler = ((err, req, res, next) => {
     if (NODE_ENV === 'development') {
         sendErrorDev(err, res)
     } else if (NODE_ENV === 'production') {
-        let error = { ...err } // copy the err object
+        let error: Error = { ...err } // copy the err object
+
         if (error.name === 'CastError') error = handleCastErrorDB(error)
+
+        if (error.code === 11000) error = handleDuplicateFieldsDB(error)
+
         sendErrorProd(error, res)
     }
 
@@ -44,5 +48,12 @@ const sendErrorProd = (err: Error, res: Response) => {
 
 const handleCastErrorDB = (err: Error) => {
     const message = `Invalid ${err.path}: ${err.value}`
+    return new AppError(message, 400)
+}
+
+const handleDuplicateFieldsDB = (err: Error) => {
+    const value = err.errmsg?.match(/(["'])(\\?.)*\1/);
+    const string = value?.length ? value[0] : null
+    const message = `Duplicate field value: ${string}. Please use another value!`
     return new AppError(message, 400)
 }

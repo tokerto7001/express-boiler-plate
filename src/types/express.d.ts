@@ -7,6 +7,8 @@ declare global {
         isOperational?: boolean
         path?: string
         value?: string
+        code?: number
+        errmsg?: string
     }
     namespace Express {
         interface Request {
