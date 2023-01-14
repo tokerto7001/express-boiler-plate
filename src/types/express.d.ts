@@ -5,6 +5,8 @@ declare global {
         status: string
         statusCode: number
         isOperational?: boolean
+        path?: string
+        value?: string
     }
     namespace Express {
         interface Request {
