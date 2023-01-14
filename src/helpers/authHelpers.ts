@@ -2,12 +2,13 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import bcrypt from 'bcrypt';
 import { UserDoc } from "../models/user";
+import { HASH_CYCLE, JWT_SECRET_KEY } from '../config';
 
 export class AuthHelpers {
     constructor() { }
 
     public hashPassword = async (password: string): Promise<string> => {
-        const hashedPassword = await bcrypt.hash(password, +process.env.HASH_CYCLE!);
+        const hashedPassword = await bcrypt.hash(password, HASH_CYCLE!);
         return hashedPassword;
     };
 
@@ -15,7 +16,7 @@ export class AuthHelpers {
         const { id, role, email } = user;
         const token = jwt.sign({
             id, role, email
-        }, process.env.JWT_SECRET_KEY!,
+        }, JWT_SECRET_KEY!,
             {
                 noTimestamp: true
             }
@@ -30,7 +31,7 @@ export class AuthHelpers {
 
     public verifyToken = (token: string) => {
         try {
-            const verifiedToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
+            const verifiedToken = jwt.verify(token, JWT_SECRET_KEY)
             return verifiedToken as UserDoc
         } catch (err) {
             throw err
@@ -43,7 +44,7 @@ export class AuthHelpers {
 
     public parseCookie = async (token: string): Promise<any> => {
         if (token) {
-            return jwt.verify(token, process.env.JWT_SECRET_KEY!);
+            return jwt.verify(token, JWT_SECRET_KEY!);
         } else {
             return null;
         }

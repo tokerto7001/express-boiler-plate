@@ -12,10 +12,11 @@ import app from './app';
 
 // connect to mongodb
 import { connectToMongoDb } from './clients/mongo';
+import { PORT } from './config';
 connectToMongoDb();
 
 // initiate the server
-const server = app.listen(process.env.PORT, () => console.log(`Serves is awake on port ${process.env.PORT}`));
+const server = app.listen(PORT, () => console.log(`Serves is awake on port ${PORT}`));
 
 // set listener for unhandled rejections
 process.on('unhandledRejection', (reason: Error, promise: Promise<any>) => {

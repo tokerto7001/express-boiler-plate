@@ -1,7 +1,8 @@
 import sendgrid from '@sendgrid/mail'
 import { welcomeMail } from '../mail/welcomeMail'
 import nodemailer from 'nodemailer'
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY) // setting the API key
+import { SENDGRID_API_KEY, SENDGRID_FROM } from '../config'
+sendgrid.setApiKey(SENDGRID_API_KEY) // setting the API key
 
 interface sendingData { // can be extended later
     to?: string
@@ -19,13 +20,13 @@ export class MailService {
                     port: 587, // recommended port
                     auth: {
                         user: 'apikey',
-                        pass: process.env.SENDGRID_API_KEY
+                        pass: SENDGRID_API_KEY
                     }
                 }
             )
             const info = await transporter.sendMail(
                 {
-                    from: process.env.SENDGRID_TO,
+                    from: SENDGRID_FROM,
                     to: data.to,
                     subject: data.subject,
                     html: mailTemplate
@@ -34,7 +35,7 @@ export class MailService {
             // await sendgrid.send(
             //     {
             //         to: data.to,
-            //         from: process.env.SENDGRID_TO,
+            //         from: SENDGRID_FROM,
             //         subject: data.subject,
             //         html: mailTemplate
             //     }
