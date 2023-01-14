@@ -15,6 +15,8 @@ export const errorHandler = ((err, req, res, next) => {
 
         if (error.code === 11000) error = handleDuplicateFieldsDB(error)
 
+        if (error.name === 'ValidationError') error = handleValidationErrorDB(error)
+
         sendErrorProd(error, res)
     }
 
@@ -55,5 +57,10 @@ const handleDuplicateFieldsDB = (err: Error) => {
     const value = err.errmsg?.match(/(["'])(\\?.)*\1/);
     const string = value?.length ? value[0] : null
     const message = `Duplicate field value: ${string}. Please use another value!`
+    return new AppError(message, 400)
+}
+
+const handleValidationErrorDB = (err: Error) => {
+    const message = `Invalid input data`
     return new AppError(message, 400)
 }
