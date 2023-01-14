@@ -3,6 +3,7 @@ import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import bcrypt from 'bcrypt';
 import { UserDoc } from "../models/user";
 import { HASH_CYCLE, JWT_SECRET_KEY } from '../config';
+import { CookieData } from '../types/cookieData';
 
 export class AuthHelpers {
     constructor() { }
@@ -12,7 +13,7 @@ export class AuthHelpers {
         return hashedPassword;
     };
 
-    public createCookie = (user: UserDoc): { token: string, cookieConfig: CookieConfigOptions } => {
+    public createCookie = (user: CookieData): { token: string, cookieConfig: CookieConfigOptions } => {
         const { id, role, email } = user;
         const token = jwt.sign({
             id, role, email
@@ -32,7 +33,7 @@ export class AuthHelpers {
     public verifyToken = (token: string) => {
         try {
             const verifiedToken = jwt.verify(token, JWT_SECRET_KEY)
-            return verifiedToken as UserDoc
+            return verifiedToken as CookieData
         } catch (err) {
             throw err
         }

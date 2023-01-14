@@ -4,6 +4,7 @@ import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import { AuthHelpers } from "../helpers/authHelpers";
 import { MailService } from "./mailService";
 import { API_URL } from "../config";
+import { CookieData } from "../types/cookieData";
 
 const authHelpers = new AuthHelpers()
 const mailService = new MailService()
@@ -24,7 +25,7 @@ export class AuthService {
                 password: hashedPassword
             }
         );
-        const { token } = authHelpers.createCookie(user)
+        const { token } = authHelpers.createCookie(user as CookieData)
         const verificationUrl = `${API_URL}/api/auth/verify/${token}`
         await mailService.sendWelcomeMail(email, firstName!, lastName!, verificationUrl)
         delete user.password
