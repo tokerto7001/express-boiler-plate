@@ -1,4 +1,4 @@
-import express, { Application, ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import authRoutes from './routes/authRoutes';
@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser"
 import { AppError } from './utils/appError';
 import { errorHandler } from './utils/errorHandler';
 import { whiteList } from './config/whiteList';
+import helmet from 'helmet';
 
 const app: Application = express();
 
@@ -24,9 +25,10 @@ if (process.env.NODE_ENV === 'development') {
         }
     ));
 }
-app.use(express.json());
+app.use(express.json({ limit: '10MB' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet())
 
 app.use('/api/auth', authRoutes);
 
