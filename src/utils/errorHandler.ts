@@ -1,66 +1,122 @@
-import { ErrorRequestHandler, Response } from "express"
-import { NODE_ENV } from "../config"
-import { AppError } from "./appError"
+import { Request, Response, NextFunction } from 'express';
+import httpStatus from 'http-status';
+import AppError from './appError';
 
-export const errorHandler = ((err, req, res, next) => {
-    err.statusCode = err.statusCode || 500
-    err.status = err.status || 'error'
+export default class ErrorHandler {
+    static convert = () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return async (err: any, req: Request, res: Response, next: NextFunction) => {
+            let error = err;
+            if (!(error instanceof AppError)) {
+                switch (error.name) {
+                    case 'AxiosError':
+                        error.statusCode =
+                            error?.response?.data?.error?.statusCode ||
+                            httpStatus.INTERNAL_SERVER_ERROR;
+                        error.message =
+                            error?.response?.data?.message ||
+                            'Something went wrong';
+                        error.isOperational = false;
+                        break;
+                    default:
+                        error.statusCode = error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
+                        error.code = error.code || error.errorCode || 1000;
+                        error.isOperational = false;
+                        break;
+                }
+                // recreate the error object with the new arguments
+                error = new AppError(
+                    error.statusCode,
+                    error.message,
+                    error.isOperational,
+                    error.name,
+                    error.stack,
+                );
+            }
+            // pass the error to the actual error handler middleware
+            next(error);
+        };
+    };
 
-    if (NODE_ENV === 'development') {
-        sendErrorDev(err, res)
-    } else if (NODE_ENV === 'production') {
-        let error: Error = { ...err } // copy the err object
+    static handle = () => {
+        return async (err: AppError, req: Request, res: Response, _next: NextFunction) => {
+            // clear cookie if authorized
+            console.log('ENV:', process.env.NODE_ENV);
+            if (process.env.NODE_ENV === 'production') {
+                this.sendErrorProd(err, req, res);
+            } else {
+                this.sendErrorDev(err, res);
+            }
+        };
+    };
 
-        if (error.name === 'CastError') error = handleCastErrorDB(error)
+    private static sendErrorDev = (err: AppError, res: Response) => {
+        // 1) log error to console
+        console.log(`💥💥💥💥💥💥💥💥💥💥💥💥💥${err.name}💥💥💥💥💥💥💥💥💥💥💥💥💥`);
+        console.log('headersSent: ?', res.headersSent);
+        console.log('isOperational: ?', err.isOperational);
+        console.log(err.message);
+        console.log('-------------stack----------------');
+        console.log(err.stack);
+        console.log('💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥');
 
-        if (error.code === 11000) error = handleDuplicateFieldsDB(error)
-
-        if (error.name === 'ValidationError') error = handleValidationErrorDB(error)
-
-        sendErrorProd(error, res)
-    }
-
-}) as ErrorRequestHandler
-
-const sendErrorDev = (err: Error, res: Response) => {
-    res.status(err.statusCode).send({
-        status: err.status,
-        message: err.message,
-        error: err,
-        stack: err.stack
-    })
-}
-
-const sendErrorProd = (err: Error, res: Response) => {
-    if (err.isOperational) { // onyl send the error details if it is handled by us
+        // 2) send error message to client
+        if (res.headersSent) return;
         res.status(err.statusCode).send({
             status: err.status,
-            message: err.message,
-        })
-    } else {
-        console.error('ERROR 💥', err)
+            data: [],
+            meta: {},
+            error: {
+                detail: err.message,
+            },
+            stack: err.stack,
+        });
+    };
 
-        res.status(err.statusCode).send({
-            status: 500,
-            message: 'Something went very wrong!',
-        })
-    }
-
-}
-
-const handleCastErrorDB = (err: Error) => {
-    const message = `Invalid ${err.path}: ${err.value}`
-    return new AppError(message, 400)
-}
-
-const handleDuplicateFieldsDB = (err: Error) => {
-    const value = err.errmsg?.match(/(["'])(\\?.)*\1/);
-    const string = value?.length ? value[0] : null
-    const message = `Duplicate field value: ${string}. Please use another value!`
-    return new AppError(message, 400)
-}
-
-const handleValidationErrorDB = (err: Error) => {
-    const message = `Invalid input data`
-    return new AppError(message, 400)
+    private static sendErrorProd = (err: AppError, req: Request, res: Response) => {
+        // console.log(err)
+        // Operational, trusted error: send message to client
+        if (err.isOperational) {
+            // check if the headers is sent
+            if (res.headersSent) {
+                console.log(`💥💥💥💥💥💥💥💥💥💥💥💥💥${err.name}💥💥💥💥💥💥💥💥💥💥💥💥💥`);
+                console.log('headersSent: ?', res.headersSent);
+                console.log('isOperational: ?', err.isOperational);
+                console.log(err.message);
+                console.log('-------------stack----------------');
+                console.log(err.stack);
+                console.log('💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥');
+            } else {
+                res.status(err.statusCode).send({
+                    status: err.status,
+                    data: [],
+                    meta: {},
+                    error: {
+                        detail: 'Something went wrong!',
+                    },
+                });
+            }
+            // Programming or other unknown error: don't leak error details
+        } else {
+            console.log(`💥💥💥💥💥💥💥💥💥💥💥💥💥${err.name}💥💥💥💥💥💥💥💥💥💥💥💥💥`);
+            console.log('headersSent: ?', res.headersSent);
+            console.log('isOperational: ?', err.isOperational);
+            console.log(err.message);
+            console.log('-------------stack----------------');
+            console.log(err.stack);
+            console.log('💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥💥');
+            // check if the headers is sent
+            if (!res.headersSent) {
+                // send generic message
+                res.status(500).send({
+                    status: 'error',
+                    data: [],
+                    meta: {},
+                    error: {
+                        detail: err.message,
+                    },
+                });
+            }
+        }
+    };
 }

@@ -5,16 +5,13 @@ process.on("uncaughtException", err => {
     process.exit(1);
 });
 import dotenv from 'dotenv';
-dotenv.config({ path: './.env' });
+dotenv.config();
 import app from './app';
 
 
 
 // connect to mongodb
-import { connectToMongoDb } from './clients/mongo';
 import { PORT } from './config';
-connectToMongoDb();
-
 // initiate the server
 const server = app.listen(PORT, () => console.log(`Serves is awake on port ${PORT}`));
 

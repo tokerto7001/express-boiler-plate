@@ -1,10 +1,10 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import authRoutes from './routes/authRoutes';
+// import authRoutes from './routes/authRoutes';
 import cookieParser from "cookie-parser"
-import { AppError } from './utils/appError';
-import { errorHandler } from './utils/errorHandler';
+import AppError from './utils/appError';
+import ErrorHandler from './utils/errorHandler';
 import { whiteList } from './config/whiteList';
 import helmet from 'helmet';
 
@@ -30,15 +30,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet())
 
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
 
 // For unmatching requests
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
-    const error = new AppError(`Can't find ${req.originalUrl}`, 404)
+    const error = new AppError(404, `Can't find ${req.originalUrl}`, true, '');
     next(error)
 })
 
 // Error handling middleware
-app.use(errorHandler)
+app.use(ErrorHandler.convert());
+app.use(ErrorHandler.handle());
 
 export default app;
