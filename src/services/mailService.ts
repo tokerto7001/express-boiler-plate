@@ -2,7 +2,7 @@ import sendgrid from '@sendgrid/mail'
 import { welcomeMail } from '../mail/welcomeMail'
 import nodemailer from 'nodemailer'
 import { SENDGRID_API_KEY, SENDGRID_FROM } from '../config'
-sendgrid.setApiKey(SENDGRID_API_KEY) // setting the API key
+sendgrid.setApiKey(SENDGRID_API_KEY!) // setting the API key
 
 interface sendingData { // can be extended later
     to?: string

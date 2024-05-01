@@ -13,9 +13,9 @@ export class AuthHelpers {
     };
 
     public createCookie = (user: CookieData): { token: string, cookieConfig: CookieConfigOptions } => {
-        const { id, role, email } = user;
+        const { id, roleId, email } = user;
         const token = jwt.sign({
-            id, role, email
+            id, roleId, email
         }, JWT_SECRET_KEY!,
             {
                 noTimestamp: true

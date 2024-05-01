@@ -10,16 +10,16 @@ if (process.env.NODE_ENV === 'development') {
     PORT = +process.env.PORT_DEV!
     HASH_CYCLE = +process.env.HASH_CYCLE!
     JWT_SECRET_KEY = process.env.JWT_SECRET_KEY_DEV!
-    SENDGRID_API_KEY = process.env.SENDGRID_API_KEY_DEV!
-    SENDGRID_FROM = process.env.SENDGRID_FROM_DEV!
+    SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!
+    SENDGRID_FROM = process.env.SENDGRID_FROM!
     NODE_ENV = process.env.NODE_ENV!
     API_URL = process.env.API_URL_DEV!
 } else {
     PORT = +process.env.PORT_PROD!
     HASH_CYCLE = +process.env.HASH_CYCLE!
     JWT_SECRET_KEY = process.env.JWT_SECRET_KEY_PROD!
-    SENDGRID_API_KEY = process.env.SENDGRID_API_KEY_PROD!
-    SENDGRID_FROM = process.env.SENDGRID_FROM_PROD!
+    SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!
+    SENDGRID_FROM = process.env.SENDGRID_FROM!
     NODE_ENV = process.env.NODE_ENV!
     API_URL = process.env.API_URL_PROD!
 }

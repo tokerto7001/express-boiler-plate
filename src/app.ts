@@ -1,7 +1,7 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-// import authRoutes from './routes/authRoutes';
+import authRoutes from './routes/authRoutes';
 import cookieParser from "cookie-parser"
 import AppError from './utils/appError';
 import ErrorHandler from './utils/errorHandler';
@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet())
 
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // For unmatching requests
 app.all('*', (req: Request, res: Response, next: NextFunction) => {

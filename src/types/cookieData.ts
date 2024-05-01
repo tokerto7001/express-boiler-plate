@@ -1,8 +1,7 @@
-import { Role } from "../models/user";
 
 export interface CookieData {
-    id: string;
-    role: Role;
+    id: number;
+    roleId: number;
     email: string;
     iat?: number
 };

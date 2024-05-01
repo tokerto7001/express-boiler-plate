@@ -6,7 +6,7 @@ export const isLoggedIn: RequestHandler = async (req, res, next) => {
     const token = await authHelpers.parseCookie(req.cookies.token)
     if (token) {
         req.userId = token.id;
-        req.role = token.role;
+        req.roleId = token.roleId;
         req.email = token.email;
         return next()
     } else {

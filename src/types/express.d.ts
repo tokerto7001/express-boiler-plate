@@ -1,5 +1,3 @@
-import { Role } from "../models/user";
-
 declare global {
     interface Error {
         status: string
@@ -13,9 +11,10 @@ declare global {
     namespace Express {
         interface Request {
             userId: string
-            role: Role
+            roleId: number;
             email: string
         }
 
     }
 }
+export {}

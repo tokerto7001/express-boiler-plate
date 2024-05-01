@@ -1,12 +1,12 @@
-// import { RequestHandler } from "express";
-// import { AuthService } from "../services/authService";
-// import { catchAsyncErrors } from "../utils/catchAsyncErrors";
-// const authService = new AuthService();
+import { RequestHandler } from "express";
+import { AuthService } from "../services/authService";
+import { catchAsyncErrors } from "../utils/catchAsyncErrors";
+const authService = new AuthService();
 
-// export const registerUser: RequestHandler = catchAsyncErrors(async (req, res, next) => {
-//     const result = await authService.registerUser(req.body)
-//     res.status(201).send({ status: 'success', message: 'User register is successsful', result })
-// });
+export const registerUser: RequestHandler = catchAsyncErrors(async (req, res, next) => {
+    const result = await authService.registerUser(req.body)
+    res.status(201).send({ status: 'success', message: 'User register is successsful', result })
+});
 
 // export const verifyUser: RequestHandler = catchAsyncErrors(async (req, res, next) => {
 //     const result = await authService.verifyUser(req.params.token)
