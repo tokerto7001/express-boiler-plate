@@ -1,17 +1,21 @@
-import { AuthHelpers } from "../helpers/authHelpers";
+import { AuthHelpers, CookieData, CookieConfigOptions } from "../helpers/authHelpers";
 import { MailService } from "./mailService";
 import { API_URL } from "../config";
 import AppError from "../utils/appError";
 import { prisma } from "../clients/db";
-import { registerBody } from "../schemas/authSchemas";
+import { TRegisterBody } from "../schemas/authSchemas";
 
 const authHelpers = new AuthHelpers()
 const mailService = new MailService()
 
+interface ICookieData {
+    token: string;
+    cookieConfig: CookieConfigOptions;
+}
 export class AuthService {
     constructor() { }
 
-    public registerUser = async (body: registerBody): Promise<void> => {
+    public registerUser = async (body: TRegisterBody): Promise<void> => {
         const { firstName, lastName, email, password } = body;
 
         const alreadyExist = await prisma.user.findFirst({ where: {email} });
@@ -33,19 +37,28 @@ export class AuthService {
         await mailService.sendWelcomeMail(email, firstName, lastName, verificationUrl);
     };
 
-    // public verifyUser = async (token: string): Promise<{ token: string, cookieConfig: CookieConfigOptions }> => {
-    //     const verifiedToken = authHelpers.verifyToken(token)
-    //     const cookieVariables = authHelpers.createCookie(verifiedToken)
-    //     const user = await User.findOne(
-    //         {
-    //             id: verifiedToken.id
-    //         }
-    //     )
-    //     if (!user) throw new AppError('User not found', 400)
-    //     user.isVerified = true;
-    //     await user.save()
-    //     return cookieVariables
-    // }
+    public verifyUser = async (token: string): Promise<ICookieData> => {
+        const verifiedToken = authHelpers.verifyToken<CookieData>(token);
+        const cookieVariables = authHelpers.createCookie(verifiedToken);
+        const user = await prisma.user.findFirst(
+            {
+                where: {
+                    id: verifiedToken.id
+                }
+            }
+        )
+        if (!user) throw new AppError(400, 'User not found');
+        
+        await prisma.user.update({
+            where: {
+                id: verifiedToken.id
+            },
+            data: {
+                isVerified: true
+            }
+        });
+        return cookieVariables;
+    }
 
     // public loginUser = async (body: UserAttributes): Promise<{ token: string, cookieConfig: CookieConfigOptions }> => {
     //     const { email, password } = body;

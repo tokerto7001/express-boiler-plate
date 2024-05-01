@@ -1,18 +1,19 @@
 import express from 'express';
-import { registerUser } from '../controllers/authController';
-import { checkBodyProperties } from '../middlewares/checkBodyProperties';
-import { validateRequestBody } from '../middlewares/validateRequestBody';
-import { registerSchema } from '../schemas/authSchemas';
+import { registerUser, verifyUser } from '../controllers/authController';
+import { registerSchema, verifyUserSchema } from '../schemas/authSchemas';
+import { TRequestObjectType, validateRequestObject } from '../middlewares/validateRequestObject';
 
 const router = express.Router();
 
 router
     .post('/register',
-        validateRequestBody(registerSchema),
+        validateRequestObject(registerSchema, TRequestObjectType.body),
         registerUser
         )
-    // .get('/verify/:token',
-    //     verifyUser)
+    .get('/verify/:token',
+        validateRequestObject(verifyUserSchema, TRequestObjectType.params),
+        verifyUser
+        )
     // .post('/login',
     //     checkBodyProperties(['email', 'password']),
     //     loginUser)

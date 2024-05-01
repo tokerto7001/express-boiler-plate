@@ -1,8 +1,19 @@
 import jwt from 'jsonwebtoken';
-import { CookieConfigOptions } from "../types/cookieConfigOptions";
 import bcrypt from 'bcrypt';
 import { HASH_CYCLE, JWT_SECRET_KEY } from '../config';
-import { CookieData } from '../types/cookieData';
+
+export interface CookieConfigOptions {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'lax'
+}
+
+export interface CookieData {
+    id: number;
+    roleId: number;
+    email: string;
+    iat?: number
+};
 
 export class AuthHelpers {
     constructor() { }
@@ -29,10 +40,10 @@ export class AuthHelpers {
         return { token, cookieConfig };
     }
 
-    public verifyToken = (token: string) => {
+    public verifyToken = <T>(token: string): T => {
         try {
             const verifiedToken = jwt.verify(token, JWT_SECRET_KEY)
-            return verifiedToken as CookieData
+            return verifiedToken as T
         } catch (err) {
             throw err
         }

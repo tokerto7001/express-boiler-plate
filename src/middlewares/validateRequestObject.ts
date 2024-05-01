@@ -2,10 +2,16 @@ import { NextFunction, Request, Response, RequestHandler } from "express"
 import AppError from "../utils/appError";
 import { ZodError, z } from "zod"
 
-export const validateRequestBody = (validationSchema: z.ZodSchema): RequestHandler => {
+export enum TRequestObjectType {
+    body = 'body',
+    query = 'query',
+    params = 'params'
+}
+
+export const validateRequestObject = (validationSchema: z.ZodSchema, objectType: TRequestObjectType): RequestHandler => {
     return (req: Request, _res: Response, next: NextFunction) => {
         try{
-            validationSchema.parse(req.body);
+            validationSchema.parse(req[objectType]);
             next();
         }catch(err: unknown){
             if(err instanceof ZodError) {
